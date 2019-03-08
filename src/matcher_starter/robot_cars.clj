@@ -3,8 +3,7 @@
             [org.clojars.cognesence.matcher.core :refer :all]
             [org.clojars.cognesence.ops-search.core :refer :all]))
 
-(def world '#{
-              (corridor corridor1)
+(def world '#{(corridor corridor1)
               (corridor corridor2)
               (corridor corridor3)
               (corridor corridor4)
@@ -112,131 +111,108 @@
 
               (connects bay17 bay18)
               (connects bay18 bay17)
+
+              (connects junction3 ex1)
+              (exchange ex1)
+              (junction ex1)
               })
 
-(def start '#{
-              (facing robot1 vertical)
+(def start '#{(facing robot1 vertical)
               (at robot1 bay1)
               (holding robot1 nil)
-              (stored planks bay2)
-              })
+              (stored planks bay2)})
 
-(def goal '#{
-             (stored planks bay17)
-             })
+(def goal '#{(stored planks ex1)})
 
-(def ops '{
-           move-to-bay          {:pre ((agent ?agent)
-                                        (at ?agent ?src)
-                                        (in ?src ?cor)
-                                        (corridor ?cor)
-                                        (connects ?src ?dst)
-                                        (bay ?dst)
-                                        (facing ?agent vertical)
-                                        )
-                                 :add ((at ?agent ?dst)
-                                        )
-                                 :del ((at ?agent ?src)
-                                        )
+(def ops '{move-to-bay          {:pre ((agent ?agent)
+                                       (at ?agent ?src)
+                                       (in ?src ?cor)
+                                       (corridor ?cor)
+                                       (connects ?src ?dst)
+                                       (bay ?dst)
+                                       (facing ?agent vertical))
+                                 :add ((at ?agent ?dst))
+                                 :del ((at ?agent ?src))
                                  :txt (bay-move ?agent ?src ?dst)
-                                 :cmd [?agent move to ?dst]
-                                 }
+                                 :cmd [?agent move to ?dst]}
 
            junction-to-junction {:pre ((agent ?agent)
-                                        (at ?agent ?src)
-                                        (connects ?src ?dst)
-                                        (junction ?src)
-                                        (junction ?dst)
-                                        (facing ?agent horizontal)
-                                        )
-                                 :add ((at ?agent ?dst)
-                                        )
-                                 :del ((at ?agent ?src)
-                                        )
+                                       (at ?agent ?src)
+                                       (connects ?src ?dst)
+                                       (junction ?src)
+                                       (junction ?dst)
+                                       (facing ?agent horizontal))
+                                 :add ((at ?agent ?dst))
+                                 :del ((at ?agent ?src))
                                  :txt (j2j ?agent ?dst)
-                                 :cmd [?agent move to ?dst]
-                                 }
+                                 :cmd [?agent move to ?dst]}
 
            corridor-to-junction {:pre ((agent ?agent)
-                                        (at ?agent ?src)
-                                        (connects ?src ?dst)
-                                        (in ?src ?cor)
-                                        (corridor ?cor)
-                                        (junction ?dst)
-                                        (facing ?agent vertical)
-                                        )
-                                 :add ((at ?agent ?dst)
-                                        )
-                                 :del ((at ?agent ?src)
-                                        )
+                                       (at ?agent ?src)
+                                       (connects ?src ?dst)
+                                       (in ?src ?cor)
+                                       (corridor ?cor)
+                                       (junction ?dst)
+                                       (facing ?agent vertical))
+                                 :add ((at ?agent ?dst))
+                                 :del ((at ?agent ?src))
                                  :txt (c2j ?agent ?dst)
-                                 :cmd [?agent move to ?dst]
-                                 }
+                                 :cmd [?agent move to ?dst]}
 
            junction-to-corridor {:pre ((agent ?agent)
-                                        (at ?agent ?src)
-                                        (connects ?src ?dst)
-                                        (in ?dst ?cor)
-                                        (corridor ?cor)
-                                        (junction ?src)
-                                        (facing ?agent vertical)
-                                        )
-                                 :add ((at ?agent ?dst)
-                                        )
-                                 :del ((at ?agent ?src)
-                                        )
+                                       (at ?agent ?src)
+                                       (connects ?src ?dst)
+                                       (in ?dst ?cor)
+                                       (corridor ?cor)
+                                       (junction ?src)
+                                       (facing ?agent vertical))
+                                 :add ((at ?agent ?dst))
+                                 :del ((at ?agent ?src))
                                  :txt (j2c ?agent ?dst)
-                                 :cmd [?agent move to ?dst]
-                                 }
+                                 :cmd [?agent move to ?dst]}
 
            face-horizontal      {:pre ((agent ?agent)
-                                        (at ?agent ?junction)
-                                        (facing ?agent vertical)
-                                        )
-                                 :add ((facing ?agent horizontal)
-                                        )
-                                 :del ((facing ?agent vertical)
-                                        )
+                                       (at ?agent ?junction)
+                                       (facing ?agent vertical))
+                                 :add ((facing ?agent horizontal))
+                                 :del ((facing ?agent vertical))
                                  :txt (face-h ?agent horizontal)
-                                 :cmd [?agent rotate horizontal]
-                                 }
+                                 :cmd [?agent rotate horizontal]}
 
            face-vertical        {:pre ((agent ?agent)
-                                        (at ?agent ?junction)
-                                        (facing ?agent horizontal)
-                                        )
-                                 :add ((facing ?agent vertical)
-                                        )
-                                 :del ((facing ?agent horizontal)
-                                        )
+                                       (at ?agent ?junction)
+                                       (facing ?agent horizontal))
+                                 :add ((facing ?agent vertical))
+                                 :del ((facing ?agent horizontal))
                                  :txt (face-v ?agent vertical)
-                                 :cmd [?agent rotate vertical]
-                                 }
+                                 :cmd [?agent rotate vertical]}
 
            pickup               {:pre ((agent ?agent)
-                                        (holding ?agent nil)
-                                        (stored ?stock ?bay)
-                                        (at ?agent ?bay)
-                                        )
-                                 :add ((holding ?agent ?stock)
-                                        )
+                                       (holding ?agent nil)
+                                       (stored ?stock ?bay)
+                                       (at ?agent ?bay)
+                                       (bay ?bay))
+                                 :add ((holding ?agent ?stock))
                                  :del ((holding ?agent nil)
-                                        (stored ?stock ?bay)
-                                        )
+                                       (stored ?stock ?bay))
                                  :txt (pickup ?agent ?stock)
-                                 :cmd [?agent pickup ?stock]
-                                 }
+                                 :cmd [?agent pickup ?stock]}
 
            drop                 {:pre ((agent ?agent)
-                                        (holding ?agent ?stock)
-                                        (at ?agent ?bay)
-                                        )
+                                       (holding ?agent ?stock)
+                                       (at ?agent ?bay)
+                                       (bay ?bay))
                                  :add ((stored ?stock ?bay)
-                                        (holding ?agent nil)
-                                        )
-                                 :del ((holding ?agent ?stock)
-                                        )
+                                       (holding ?agent nil))
+                                 :del ((holding ?agent ?stock))
                                  :txt (dropped ?agent ?stock)
-                                 :cmd [?agent drop ?stock]
-                                 }
-           })
+                                 :cmd [?agent drop ?stock]}
+
+           drop-in-ex           {:pre ((agent ?agent)
+                                       (holding ?agent ?stock)
+                                       (at ?agent ?exchange)
+                                       (exchange ?exchange))
+                                 :add ((stored ?stock ?exchange)
+                                       (holding ?agent nil))
+                                 :del ((holding ?agent ?stock))
+                                 :txt (dropped ?agent ?stock)}})
